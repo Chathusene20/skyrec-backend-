@@ -5,7 +5,7 @@ const productRouter = express.Router();
 
 // CRUD operation
 
-productRouter.get("/", getProduct);   // ✅ matches the exported function name
+productRouter.get("/", getProduct);   //  matches the exported function name
 productRouter.post("/", createProduct);
 productRouter.delete("/:productID",deleteProduct);
 productRouter.put("/:productID",updateProduct)

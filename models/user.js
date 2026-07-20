@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(         // Schema crated to save the str
         },
         image : {
             type : String,
-            default : "http://www.gravatar.com/avatar/"
+            default : "/user.png"
         }
     }
 )   

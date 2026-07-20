@@ -1,55 +1,46 @@
 import express from "express";
-import mongoose from "mongoose";;
-import userRouter from "./routes/userRouter.js";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+
+import userRouter from "./routes/userRouter.js";
 import productRouter from "./routes/productRouter.js";
+import orderRouter from "./routes/orderRouter.js";
 
-const app = express()
 
-app.use(express.json())
+dotenv.config();
 
-app.use((req, res, next) => {
-    let token = req.header("Authorization");
-    if (token != null) {
-        token = token.replace("Bearer ", "");
-        jwt.verify(token, "jwt-secret", (err, decoded) => {
-            if (decoded == null) {
-                res.json({ message: "Invalid token please login again" });
-                return;   // stop
-            } else {
-                console.log(decoded);
-                req.user = decoded;   // attach user data
-                next();               // continue to the route
-            }
-        });
-    } else {
-        next();
-    }
+const app = express();
+
+
+app.get("/", (req,res)=>{
+    res.send("SkyRec Backend is running");
 });
 
-const connectionString = "mongodb+srv://admin:1234@cluster0.du3u7fh.mongodb.net/?appName=Cluster0"
+
+app.use(cors({
+    origin:"http://localhost:5173",
+    methods:["GET","POST","PUT","DELETE","OPTIONS"],
+    allowedHeaders:["Content-Type","Authorization"],
+    credentials:true
+}));
 
 
-mongoose.connect(connectionString).then(
-    ()=>{
-        console.log("Database connected")
-    }
-).catch(
-    ()=>{
-        console.log("Database connection failed")
-    }
-)
+app.use(express.json());
 
 
-
-app.use("/users",userRouter)
-app.use("/products",productRouter)
+// JWT middleware here
 
 
-app.listen(5000, 
-    ()=>{
-       
-        console.log ("Server is running on port 5000")
+app.use("/api/users", userRouter);
+app.use("/api/products", productRouter);
+app.use("/api/orders", orderRouter);
 
-    }
-)
+
+app.listen(process.env.PORT || 5000, ()=>{
+    console.log(
+       "Server is running on port " + 
+       (process.env.PORT || 5000)
+    );
+});

@@ -1,6 +1,7 @@
 import Product from "../models/product.js";
 import {isAdmin} from "./userController.js";
 
+
   
  
 export async function createProduct(req,res){
@@ -34,12 +35,8 @@ export async function createProduct(req,res){
 }
 
 export async function getProduct(req,res) {
-    if (!isAdmin(req)){
-        res.status(403).json ({
-            message : "You are not authorized to create a product "
-        });
-        return;
-    }
+
+
     try {
         const products = await Product.find()
         res.json(products);
@@ -47,7 +44,7 @@ export async function getProduct(req,res) {
         console.error(err);
         res.status(500).json({
             message : "Failed to retrieve products ",
-        })
+        });
     }
     
 }
