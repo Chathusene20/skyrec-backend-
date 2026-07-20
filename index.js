@@ -18,16 +18,26 @@ app.get("/", (req,res)=>{
     res.send("SkyRec Backend is running");
 });
 
-
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin: [
+        "http://localhost:5173",
+        "https://your-frontend-url.onrender.com"
+    ],
     methods:["GET","POST","PUT","DELETE","OPTIONS"],
     allowedHeaders:["Content-Type","Authorization"],
     credentials:true
 }));
 
 
+
+
+
+
 app.use(express.json());
+
+app.get("/", (req,res)=>{
+    res.send("SkyRec Backend is running");
+});
 
 
 // JWT middleware here
