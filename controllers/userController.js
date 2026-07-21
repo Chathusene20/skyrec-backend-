@@ -128,143 +128,87 @@ export function createUser(req, res) {
 // Login User
 // ===============================
 
-export function loginUser(req, res) {
-    
+export async function loginUser(req, res) {
+
     console.log("LOGIN API CALLED");
-    console.log("BODY:", req.body);
+
+    console.log("EMAIL:", req.body.email);
+    console.log("PASSWORD:", req.body.password);
 
 
-    User.findOne({
+    try {
 
-        email: req.body.email
-
-    })
-
-    .then((user) => {
+        const user = await User.findOne({
+            email: req.body.email
+        });
 
 
-        if (user == null) {
+        console.log("USER FOUND:", user);
+
+
+        if (!user) {
 
             return res.status(404).json({
-
                 message: "User not found"
-
             });
 
         }
 
 
-
-        // Check password
-
-        const isPasswordMatching = bcrypt.compareSync(
-
+        const passwordMatch = bcrypt.compareSync(
             req.body.password,
-
             user.password
-
         );
 
 
+        console.log("PASSWORD MATCH:", passwordMatch);
 
-        if (!isPasswordMatching) {
 
+        if (!passwordMatch) {
 
             return res.status(401).json({
-
                 message: "Invalid password"
-
             });
-
 
         }
 
 
-
-        // Create JWT Token
-
         const token = jwt.sign(
-
             {
-
                 email: user.email,
-
-                firstName: user.firstName,
-
-                lastName: user.lastName,
-
-                role: user.role,
-
-                isEmailVerified: user.isEmailVerified,
-
-                image: user.image
-
+                role: user.role
             },
-
-
             process.env.JWT_SECRET
-
         );
-
-
 
 
         res.json({
 
-            message: "Login successful",
+            message:"Login successful",
 
+            token:token,
 
-            token: token,
-
-
-            user: {
-
-                email: user.email,
-
-                firstName: user.firstName,
-
-                lastName: user.lastName,
-
-                role: user.role,
-
-                isEmailVerified: user.isEmailVerified,
-
-                image: user.image
-
+            user:{
+                email:user.email,
+                firstName:user.firstName,
+                lastName:user.lastName,
+                role:user.role,
+                image:user.image
             }
 
         });
 
 
+    } catch(error){
 
-    })
-
-
-
-    .catch((err) => {
-
-    console.log("LOGIN ERROR:", err);
-
-    res.status(500).json({
-        message: "Login failed",
-        error: err.message
-    });
-
-});
+        console.log("LOGIN ERROR:",error);
 
 
-    
+        res.status(500).json({
+            message:"Login failed"
+        });
 
-
-    
-
-    
-
-    
-
-
-    
-
+    }
 
 }
 // ===============================
