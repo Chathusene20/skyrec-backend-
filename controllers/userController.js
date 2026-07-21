@@ -117,6 +117,9 @@ export function createUser(req, res) {
 // ===============================
 
 export function loginUser(req, res) {
+    
+    console.log("LOGIN API CALLED");
+    console.log("BODY:", req.body);
 
 
     User.findOne({
@@ -228,18 +231,27 @@ export function loginUser(req, res) {
 
     .catch((err) => {
 
+    console.log("LOGIN ERROR:", err);
 
-        console.log(err);
-
-
-        res.status(500).json({
-
-            message: "Login failed"
-
-        });
-
-
+    res.status(500).json({
+        message: "Login failed",
+        error: err.message
     });
+
+});
+
+
+    
+
+
+    
+
+    
+
+    
+
+
+    
 
 
 }
