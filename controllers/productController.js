@@ -41,9 +41,10 @@ export async function getProduct(req,res) {
         const products = await Product.find()
         res.json(products);
     }catch(err){
-        console.error(err);
+        console.error("Product Error:",err);
         res.status(500).json({
             message : "Failed to retrieve products ",
+              error: err.message
         });
     }
     
