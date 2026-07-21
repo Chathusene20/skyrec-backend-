@@ -14,9 +14,8 @@ dotenv.config();
 // Nodemailer Configuration
 // ===============================
 
-const transporter = nodemailer.createTransport({
 
-    service: "gmail",
+const transporter = nodemailer.createTransport({
 
     host: "smtp.gmail.com",
 
@@ -24,16 +23,27 @@ const transporter = nodemailer.createTransport({
 
     secure: false,
 
+    family: 4,
+
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.APP_PASSWORD,
     }
 
+});
+
+
+
+
+
+
+
+
     
     
     
 
-});
+
 
 
 // Check mail server connection
