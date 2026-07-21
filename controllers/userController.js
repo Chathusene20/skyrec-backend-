@@ -23,6 +23,8 @@ const transporter = nodemailer.createTransport({
 
     secure: false,
 
+    requireTLS: true,
+
     family: 4,
 
     auth: {
@@ -39,9 +41,9 @@ const transporter = nodemailer.createTransport({
 
 
 
-    
-    
-    
+
+
+
 
 
 
