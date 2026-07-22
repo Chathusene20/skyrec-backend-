@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
 
 import userRouter from "./routes/userRouter.js";
 import productRouter from "./routes/productRouter.js";
@@ -10,56 +9,106 @@ import orderRouter from "./routes/orderRouter.js";
 
 
 dotenv.config();
+
+
 console.log("MONGO_URI:", process.env.MONGO_URI);
 
+
+// MongoDB Connection
+
 mongoose.connect(process.env.MONGO_URI)
+
 .then(()=>{
+
     console.log("MongoDB connected successfully");
+
 })
+
 .catch((error)=>{
-    console.log("MongoDB connection error:", error);
+
+    console.log(
+        "MongoDB connection error:",
+        error
+    );
+
 });
+
+
 
 const app = express();
 
 
-app.get("/", (req,res)=>{
-    res.send("SkyRec Backend is running");
-});
 
-app.use(cors({
-    origin: [
+// CORS
+
+app.use(cors(
+    {
+
+    origin:[
         "http://localhost:5173",
         "https://your-frontend-url.onrender.com"
     ],
-    methods:["GET","POST","PUT","DELETE","OPTIONS"],
-    allowedHeaders:["Content-Type","Authorization"],
+
+    methods:[
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "OPTIONS"
+    ],
+
+    allowedHeaders:[
+        "Content-Type",
+        "Authorization"
+    ],
+
     credentials:true
-}));
+
+}
+));
 
 
 
 
-
+// JSON Middleware
 
 app.use(express.json());
 
-app.get("/", (req,res)=>{
+
+
+
+// Test Route
+
+app.get("/",(req,res)=>{
+
     res.send("SkyRec Backend is running");
+
 });
 
 
-// JWT middleware here
 
+
+// Routes
 
 app.use("/api/users", userRouter);
+
 app.use("/api/products", productRouter);
+
 app.use("/api/orders", orderRouter);
 
 
-app.listen(process.env.PORT || 5000, ()=>{
-    console.log(
-       "Server is running on port " + 
-       (process.env.PORT || 5000)
-    );
-});
+
+
+
+app.listen(
+    process.env.PORT || 5000,
+
+    ()=>{
+
+        console.log(
+            "Server is running on port " +
+            (process.env.PORT || 5000)
+        );
+
+    }
+);

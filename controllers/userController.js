@@ -155,10 +155,18 @@ export async function loginUser(req, res) {
         }
 
 
-        const passwordMatch = bcrypt.compareSync(
-            req.body.password,
-            user.password
-        );
+        console.log("ENTERED PASSWORD:", req.body.password);
+console.log("DATABASE PASSWORD:", user.password);
+
+const passwordMatch = bcrypt.compareSync(
+    req.body.password,
+    user.password
+);
+
+console.log("MATCH:", passwordMatch);
+        
+        
+        
 
 
         console.log("PASSWORD MATCH:", passwordMatch);
