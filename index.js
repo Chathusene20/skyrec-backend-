@@ -45,7 +45,7 @@ app.use(cors({
 
     origin:[
         "http://localhost:5173",
-        "https://your-frontend-url.onrender.com"
+        "https://skyrec-frontend-umxy.vercel.app"
     ],
 
     methods:[
