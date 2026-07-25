@@ -35,8 +35,26 @@ const transporter = nodemailer.createTransport({
    rejectUnauthorized:false
 }, 
 
-
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

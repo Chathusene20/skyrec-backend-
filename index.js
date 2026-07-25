@@ -42,27 +42,13 @@ const app = express();
 // CORS
 
 app.use(cors({
-
-    origin:[
+    origin: [
         "http://localhost:5173",
-        "https://skyrec-frontend-umxy.vercel.app"
+        "https://skyrec-frontend-utb6-psi.vercel.app"
     ],
-
-    methods:[
-        "GET",
-        "POST",
-        "PUT",
-        "DELETE",
-        "OPTIONS"
-    ],
-
-    allowedHeaders:[
-        "Content-Type",
-        "Authorization"
-    ],
-
-    credentials:true
-
+    methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+    allowedHeaders: ["Content-Type","Authorization"],
+    credentials: true
 }));
 
 
