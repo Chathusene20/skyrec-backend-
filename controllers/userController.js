@@ -25,53 +25,22 @@ const transporter = nodemailer.createTransport({
 
     requireTLS: true,
 
+    family: 4,
+
     
 
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.APP_PASSWORD,
     },
-    tls: {
-    rejectUnauthorized: false
-    }
+    
+    
+    
 
    
 
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Check mail server connection
 
