@@ -44,7 +44,8 @@ const app = express();
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://skyrec-frontend-w636-liart.vercel.app"
+        "https://skyrec-frontend-w636-liart.vercel.app",
+        "https://skyrec-frontend-utb6-psi.vercel.app"
     ],
     methods: ["GET","POST","PUT","DELETE","OPTIONS"],
     allowedHeaders: ["Content-Type","Authorization"],
