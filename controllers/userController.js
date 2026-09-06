@@ -17,27 +17,14 @@ dotenv.config();
 
 const transporter = nodemailer.createTransport({
 
+    service: "gmail",
     host: "smtp.gmail.com",
-
     port: 587,
-
     secure: false,
-
-    requireTLS: true,
-
-    family: 4,
-
-    
-
     auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.APP_PASSWORD,
+         user: process.env.EMAIL_USER,
+         pass: process.env.APP_PASSWORD,
     },
-    
-    
-    
-
-   
 
 
 });
@@ -638,343 +625,291 @@ export async function sendOTP(req, res) {
 
 
 
-    if (!email) {
+    if (email==null) {
 
 
-        return res.status(400).json({
+        res.status(400).json({
 
             message: "Email is required"
 
         });
+        return
 
 
     }
 
+    const otp = Math.floor(100000 + Math.random() * 900000);
 
-
-    try {
-
-
-
-        const user = await User.findOne({
-
-            email: email
-
-        });
-
-
-
-        if (!user) {
-
-
-            return res.status(404).json({
-
-                message: "User not found"
-
-            });
-
-
-        }
-
-
-
-
-
-        const otp = Math.floor(
-
-            100000 + Math.random() * 900000
-
-        );
-
-
-
-        console.log(
-            "Generated OTP:",
-            otp
-        );
-
-
-
-
+    try{
 
         await OTP.deleteMany({
-
-            email: email
-
+            email : email
         });
 
-
-
-
-
-        const newOTP = new OTP({
-
-            email: email,
-
-            otp: otp.toString()
-
+        const newOTP = new OTP ({
+            email : email,
+            otp : otp,
+       
         });
-
-
-
-
         await newOTP.save();
 
-
-
-
-
-
-
-        const mailResult = await transporter.sendMail({
-
-
-            from:
-            `"Crystal Beauty Clear" <${process.env.EMAIL_USER}>`,
-
-
-            to: email,
-
-
-            subject:
-            "Reset Your Password - OTP",
-
-
-
-            html: getDesignedEmail({
-
-
-                title:
-                "Password Reset",
-
-
-
-                subtitle:
-                "Password Reset Verification",
-
-
-
-                greeting:
-                `Hello ${user.firstName} 👋`,
-
-
-
-                message:
-                "We received a request to reset your password. Use the OTP below to continue. Do not share this code with anyone.",
-
-
-
-                otp: otp,
-
-
-
-                validity:
-                "10 minutes",
-
-
-
-                companyName:
-                "Crystal Beauty Clear"
-
-
-            })
-
-
-        });
-
-
-
-
-        console.log(
-            "MAIL SENT:",
-            mailResult.messageId
-        );
-
-
-
+        await transporter.sendMail({
+            from : process.env.EMAIL_USER,
+            to : email,
+            subject : "Your OTP for password reset",
+            text : `Your OTP for password reset is ${otp}.It is valid for 10 minutes.`
+        })
 
         res.json({
-
-            message:
-            "OTP sent to your email"
-
+            message: "OTP send to your email"
         });
 
-
-
-    } catch(error) {
-
-
-        console.log(
-            "OTP Error:",
-            error
-        );
-
-
+    }catch(err){
         res.status(500).json({
-
-            message:
-            "Failed to send OTP"
-
+            message: "Failed to send OTP"
         });
-
-
     }
-
-
 }
-// ===============================
-// Change Password Using OTP
-// ===============================
 
-export async function changePasswordViaOTP(req, res) {
-
-
+export async function changePasswordViaOTP(req,res){
     const email = req.body.email;
-
-    const otp = req.body.otp?.toString();
-
+    const otp = req.body.otp;
     const newPassword = req.body.newPassword;
-
-
-
-    if (!email || !otp || !newPassword) {
-
-
-        return res.status(400).json({
-
-            message:
-            "Email, OTP and new password are required"
-
+try{
+    const otpRecord = await OTP.findOne({
+        email : email,
+        otp :otp 
+    });
+    
+    if(otpRecord == null){
+        res.status(400).json({
+            message: "Invalid OTP"
         });
-
-
+        return;
     }
 
+    await OTP.deleteMany({
+        email : email 
+    }); 
 
-
-    console.log("Email:", email);
-
-    console.log("OTP:", otp);
-
-
-
-    try {
-
-
-
-        // Find OTP record
-
-        const otpRecord = await OTP.findOne({
-
-            email: email,
-
-            otp: otp
-
+    const hashedPassword = bcrypt.hashSync(newPassword, 10)
+  
+        await User.updateOne({
+            email : email 
+        },{
+            password : hashedPassword
         });
 
-
-
-
-        if (!otpRecord) {
-
-
-            return res.status(400).json({
-
-                message:
-                "Invalid OTP"
-
-            });
-
-
-        }
-
-
-
-
-        // Delete OTP after successful verification
-
-        await OTP.deleteMany({
-
-            email: email
-
-        });
-
-
-
-
-
-
-        // Hash new password
-
-        const hashedPassword = bcrypt.hashSync(
-
-            newPassword,
-
-            10
-
-        );
-
-
-
-
-
-
-        // Update password
-
-        await User.updateOne(
-
-            {
-
-                email: email
-
-            },
-
-            {
-
-                password: hashedPassword
-
-            }
-
-
-        );
-
-
-
-
-
-        res.json({
-
-            message:
-            "Password changed successfully"
-
-        });
-
-
-
-
-
-    } catch(error) {
-
-
-
-        console.log(
-            "Change Password Error:",
-            error
-        );
-
-
-
+    }catch(err){
         res.status(500).json({
-
-            message:
-            "Failed to change password"
-
+            message: "Failed to change password"
         });
-
-
-
     }
 
-
+    
 }
+
+
+
+   
+
+
+
+   
+
+   
+
+   
+
+
+
+   
+
+
+   
+
+   
+
+   
+
+
+   
+
+
+
+
+
+   
+
+   
+
+   
+
+
+
+   
+   
+   
+   
+
+
+
+
+
+   
+
+   
+
+   
+
+
+
+
+
+   
+
+   
+
+   
+
+   
+
+
+
+
+   
+
+
+
+
+
+
+
+   
+
+
+   
+   
+
+
+   
+
+
+   
+   
+
+
+
+   
+
+
+   
+   
+
+
+
+   
+   
+
+
+
+   
+   
+
+
+
+   
+   
+
+
+
+   
+
+
+
+   
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
