@@ -584,71 +584,135 @@ export async function blockOrUnblockUser(req, res) {
 // Send OTP Email
 // ===============================
 
+
+    
+   
+// ===============================
+// Send OTP Email using Resend
+// ===============================
+
 export async function sendOTP(req, res) {
 
-   
+    console.log("SEND OTP API CALLED");
 
     const email = req.params.email;
 
-  
+    if (!email) {
 
-
-
-    if (email==null) {
-
-
-        res.status(400).json({
-
+        return res.status(400).json({
             message: "Email is required"
-
         });
-        return
-
-
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000);
+    const otp = Math.floor(
+        100000 + Math.random() * 900000
+    ).toString();
 
-    try{
+    try {
 
+        // Delete old OTP
         await OTP.deleteMany({
-            email : email
+            email: email
         });
 
-        const newOTP = new OTP ({
-            email : email,
-            otp : otp,
-       
+        // Save new OTP
+        const newOTP = new OTP({
+            email: email,
+            otp: otp
         });
+
         await newOTP.save();
 
-        //Send email using Resend 
 
-    const { data, error } = await resend.emails.send({
+        // ==================================
+        // Create stylish HTML email
+        // ==================================
 
-    from: "SkyRec <onboarding@resend.dev>",
-    to: [email],
-    subject: "Your OTP for password reset",
-    text: `Your OTP for password reset is ${otp}. It is valid for 10 minutes.`
+        const emailHTML = getDesignedEmail({
 
-    });
+            title: "Verification Code",
 
-     if (error) {
-     console.log("Resend Error:", error);
-     throw new Error("Failed to send email");
-      }
-        
-     res.json({
-            message: "OTP send to your email"
+            subtitle: "Password Reset Verification",
+
+            greeting: "Hello,",
+
+            message:
+                "Please use the verification code below to reset your password.",
+
+            otp: otp,
+
+            validity: "10 minutes",
+
+            companyName: "Crystal Beauty Clear"
+
         });
 
-    }catch(err){
-        console.log("OTP ERROR:",err)
-        res.status(500).json({
+
+        // ==================================
+        // Send email using Resend
+        // ==================================
+
+        const { data, error } = await resend.emails.send({
+
+            from: "SkyRec <onboarding@resend.dev>",
+
+            to: [email],
+
+            subject: "Your OTP for Password Reset",
+
+            html: emailHTML
+
+        });
+
+
+        // ==================================
+        // Check Resend error
+        // ==================================
+
+        if (error) {
+
+            console.error("RESEND ERROR:", error);
+
+            // Remove OTP if email wasn't sent
+            await OTP.deleteMany({
+                email: email
+            });
+
+            return res.status(500).json({
+                message: "Failed to send OTP email"
+            });
+        }
+
+
+        console.log(
+            "EMAIL SENT SUCCESSFULLY:",
+            data
+        );
+
+
+        return res.status(200).json({
+
+            message: "OTP sent to your email"
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "OTP EMAIL ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+
             message: "Failed to send OTP"
+
         });
     }
 }
+
+    
+
 
 
 export async function changePasswordViaOTP(req,res){
