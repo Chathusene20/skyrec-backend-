@@ -2,49 +2,15 @@ import axios from "axios";
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import OTP from "../models/otpModel.js";
 import getDesignedEmail from "../lib/emailDesigner.js";
+import { Resend } from "resend";
 
 dotenv.config();
 
 
-// ===============================
-// Nodemailer Configuration
-// ===============================
-
-
-const transporter = nodemailer.createTransport({
-
-    service: "gmail",
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-         user: process.env.EMAIL_USER,
-         pass: process.env.APP_PASSWORD,
-    },
-
-
-});
-
-// Check mail server connection
-
-transporter.verify((error, success) => {
-
-    if (error) {
-
-        console.log("Mail Error:", error);
-
-    } else {
-
-        console.log("Mail server is ready.");
-
-    }
-
-});
-
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 
 // ===============================
@@ -620,8 +586,11 @@ export async function blockOrUnblockUser(req, res) {
 
 export async function sendOTP(req, res) {
 
+   
 
     const email = req.params.email;
+
+  
 
 
 
@@ -653,23 +622,34 @@ export async function sendOTP(req, res) {
         });
         await newOTP.save();
 
-        await transporter.sendMail({
-            from : process.env.EMAIL_USER,
-            to : email,
-            subject : "Your OTP for password reset",
-            text : `Your OTP for password reset is ${otp}.It is valid for 10 minutes.`
-        })
+        //Send email using Resend 
 
-        res.json({
+    const { data, error } = await resend.emails.send({
+
+    from: "SkyRec <onboarding@resend.dev>",
+    to: [email],
+    subject: "Your OTP for password reset",
+    text: `Your OTP for password reset is ${otp}. It is valid for 10 minutes.`
+
+    });
+
+     if (error) {
+     console.log("Resend Error:", error);
+     throw new Error("Failed to send email");
+      }
+        
+     res.json({
             message: "OTP send to your email"
         });
 
     }catch(err){
+        console.log("OTP ERROR:",err)
         res.status(500).json({
             message: "Failed to send OTP"
         });
     }
 }
+
 
 export async function changePasswordViaOTP(req,res){
     const email = req.body.email;
