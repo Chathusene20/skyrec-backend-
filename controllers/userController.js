@@ -744,14 +744,32 @@ try{
             password : hashedPassword
         });
 
-    }catch(err){
-        res.status(500).json({
+        // IMPORTANT: Send successful response
+        return res.status(200).json({
+            message: "Password changed successfully"
+        });
+
+    } catch (err) {
+        console.error("Change password error:", err);
+
+        return res.status(500).json({
             message: "Failed to change password"
         });
     }
-
-    
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
