@@ -812,6 +812,7 @@ export async function updatePasssword(req,res){
         });
 
     }
+}
 
 
 
