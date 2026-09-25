@@ -145,7 +145,7 @@ export async function getProductsBySearch(req,res){
                    name : { $regex :query , $options : "i"},
                 },
                 {
-                    alternates : {$elemMatch : {$regex : query, $options : "i"}}
+                    alternates : {$elemMatch : {$regex : query, $options : "i"}},
                 },
 
             ],
