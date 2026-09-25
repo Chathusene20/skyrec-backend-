@@ -10,7 +10,7 @@ productRouter.get("/", getProduct);   //  matches the exported function name
 productRouter.post("/",verifyToken, createProduct);
 productRouter.delete("/:productID",verifyToken,deleteProduct);
 productRouter.put("/:productID",verifyToken,updateProduct)
-productRouter.get("/search/query",getProductsBySearch)
+productRouter.get("/search/:query",getProductsBySearch)
 productRouter.get("/:productID",getProductId)
 
 

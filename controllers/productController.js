@@ -140,12 +140,12 @@ export async function getProductsBySearch(req,res){
         const query = req.params.query;
 
         const products = await Product.find({
-            $or:[
+            $or: [
                 {
                    name : { $regex :query , $options : "i"},
                 },
                 {
-                    altNames : {$elemMatch : {$regex : query, $options : "i"}}
+                    alternates : {$elemMatch : {$regex : query, $options : "i"}}
                 },
 
             ],
