@@ -46,7 +46,7 @@ app.use(cors({
         "http://localhost:5173",
         "https://skyrec-frontend-w636-liart.vercel.app",
         "https://skyrec-frontend-utb6-psi.vercel.app",
-        "https://skyrec-frontend-p8zn.vercel.app/products"
+        "https://skyrec-frontend-p8zn.vercel.app"
     ],
     methods: ["GET","POST","PUT","DELETE","OPTIONS"],
     allowedHeaders: ["Content-Type","Authorization"],
