@@ -224,25 +224,44 @@ export function isCustomer(req) {
 // Get Logged User
 // ===============================
 
-export function getUser(req, res) {
-
+export async function getUser(req, res) {
 
     if (req.user == null) {
-
         return res.status(401).json({
-
             message: "Unauthorized"
-
         });
-
     }
 
+    try {
 
+        const user = await User.findOne({
+            email: req.user.email
+        }).select("-password");
 
-    res.json(req.user);
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
 
+        res.json(user);
 
+    } catch (error) {
+
+        console.log("GET USER ERROR:", error);
+
+        res.status(500).json({
+            message: "Failed to get user data"
+        });
+    }
 }
+
+
+
+
+
+
+
 
 
 
@@ -758,32 +777,73 @@ try{
     }
 }
 
-export async function updateUserData(req,res){
-    if (req.user == null ) {
-        res.status(401).json({
-            message : "Unauthorized",
 
-        })
-        return;
+
+export async function updateUserData(req, res) {
+
+    if (req.user == null) {
+        return res.status(401).json({
+            message: "Unauthorized"
+        });
     }
-    try{
-        await User.updateOne({
-            email:req.user.email
-        },{
-            firstName:req.body.firstName,
-            lastName:req.body.lastName,
-            image:req.body.image
-        })
+
+    try {
+
+        const updatedUser = await User.findOneAndUpdate(
+            {
+                email: req.user.email
+            },
+            {
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                image: req.body.image
+            },
+            {
+                new: true
+            }
+        ).select("-password");
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
         res.json({
-            message:"User data updated successfully",
+            message: "User data updated successfully",
+            user: updatedUser
         });
 
-    }catch(err){
-     res.status(500).json ({
-        message: "Failed to update user data",
-     });
+    } catch (err) {
+
+        console.log("UPDATE USER ERROR:", err);
+
+        res.status(500).json({
+            message: "Failed to update user data"
+        });
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export async function updatePasssword(req,res){
     if (req.user == null ){

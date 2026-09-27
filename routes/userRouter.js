@@ -12,7 +12,8 @@ userRouter.get("/all-users",verifyToken,getAllUsers);
 userRouter.put("/block/:email",verifyToken,blockOrUnblockUser);
 userRouter.get("/send-otp/:email",sendOTP)
 userRouter.post("/change-password/",changePasswordViaOTP)
-userRouter.put("/me" ,updateUserData)
-userRouter.put("/me/password",updatePasssword);
+userRouter.put("/me", verifyToken, updateUserData);
+userRouter.put("/me/password", verifyToken, updatePasssword);
+
 
 export default userRouter;
