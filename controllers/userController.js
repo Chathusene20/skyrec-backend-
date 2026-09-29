@@ -293,7 +293,7 @@ export async function googleLogin(req, res) {
                 code: code,
                 client_id: process.env.GOOGLE_CLIENT_ID,
                 client_secret: process.env.GOOGLE_CLIENT_SECRET,
-                redirect_uri: "https://skyrec-frontend-p8zn.vercel.app",
+                redirect_uri: "https://skyrec-frontend-p8zn.vercel.app/login",
                 grant_type: "authorization_code"
             }
         );
