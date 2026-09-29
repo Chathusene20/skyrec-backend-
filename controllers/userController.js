@@ -270,48 +270,52 @@ export async function getUser(req, res) {
 // ===============================
 // Google Login
 // ===============================
-
 export async function googleLogin(req, res) {
 
+    const { code } = req.body;
 
-    const token = req.body.token;
-
-
-    if (!token) {
+    if (!code) {
 
         return res.status(400).json({
 
-            message: "Google token is required"
+            message: "Google authorization code is required"
 
         });
 
     }
 
-
-
     try {
 
+        // Exchange Google authorization code for access token
+        const tokenResponse = await axios.post(
+            "https://oauth2.googleapis.com/token",
+            {
+                code: code,
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SECRET,
+                redirect_uri: "https://skyrec-frontend-p8zn.vercel.app",
+                grant_type: "authorization_code"
+            }
+        );
 
+        const accessToken = tokenResponse.data.access_token;
+
+
+        // Get Google user information
         const googleResponse = await axios.get(
 
             "https://www.googleapis.com/oauth2/v3/userinfo",
 
             {
-
                 headers: {
-
-                    Authorization: `Bearer ${token}`
-
+                    Authorization: `Bearer ${accessToken}`
                 }
-
             }
 
         );
 
 
-
         const googleUser = googleResponse.data;
-
 
 
         let user = await User.findOne({
@@ -321,11 +325,8 @@ export async function googleLogin(req, res) {
         });
 
 
-
         // Create new user
-
         if (!user) {
-
 
             user = new User({
 
@@ -346,18 +347,12 @@ export async function googleLogin(req, res) {
 
             });
 
-
-
             await user.save();
-
 
         }
 
 
-
-
         if (user.isBlock) {
-
 
             return res.status(403).json({
 
@@ -366,14 +361,10 @@ export async function googleLogin(req, res) {
 
             });
 
-
         }
 
 
-
-
         const jwtToken = jwt.sign(
-
 
             {
 
@@ -389,30 +380,20 @@ export async function googleLogin(req, res) {
 
                 image: user.image
 
-
             },
 
-
             process.env.JWT_SECRET
-
 
         );
 
 
-
-
-
         res.json({
-
 
             message: "Login successful",
 
-
             token: jwtToken,
 
-
             user: {
-
 
                 email: user.email,
 
@@ -426,19 +407,17 @@ export async function googleLogin(req, res) {
 
                 image: user.image
 
-
             }
-
 
         });
 
 
-
     } catch (error) {
 
-
-        console.log(error);
-
+        console.log(
+            "GOOGLE LOGIN ERROR:",
+            error.response?.data || error.message
+        );
 
         res.status(500).json({
 
@@ -446,10 +425,10 @@ export async function googleLogin(req, res) {
 
         });
 
-
     }
 
 }
+
 
 
 
