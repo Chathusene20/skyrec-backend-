@@ -875,6 +875,77 @@ export async function updatePasssword(req,res){
 }
 
 
+// ===============================
+// Send Contact Message
+// ===============================
+
+export async function sendContactMessage(req, res) {
+
+    const { name, email, subject, message } = req.body;
+
+    if (!name || !email || !subject || !message) {
+        return res.status(400).json({
+            message: "All fields are required"
+        });
+    }
+
+    try {
+
+        const emailHTML = `
+            <div style="font-family: Arial, sans-serif;">
+                <h2>New Contact Message - Crystal Beauty Clear</h2>
+
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Subject:</strong> ${subject}</p>
+
+                <hr>
+
+                <h3>Message:</h3>
+                <p>${message}</p>
+            </div>
+        `;
+
+        const { data, error } = await resend.emails.send({
+
+            from: "SkyRec <onboarding@resend.dev>",
+
+            to: ["chathuminisenethya246@gmail.com"],
+
+            replyTo: email,
+
+            subject: `Contact Message: ${subject}`,
+
+            html: emailHTML
+        });
+
+        if (error) {
+
+            console.error("RESEND CONTACT ERROR:", error);
+
+            return res.status(500).json({
+                message: "Failed to send contact message"
+            });
+        }
+
+        console.log("CONTACT EMAIL SENT:", data);
+
+        return res.status(200).json({
+            message: "Message sent successfully"
+        });
+
+    } catch (error) {
+
+        console.error("CONTACT EMAIL ERROR:", error);
+
+        return res.status(500).json({
+            message: "Failed to send message"
+        });
+    }
+}
+
+
+
 
  
 
